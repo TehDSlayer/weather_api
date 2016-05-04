@@ -1,27 +1,36 @@
-window.onload = function (){
-	var formElement = document.getElementById('form');
-	var inputElement = document.getElementById('input');
-
-	formElement.onsubmit = function(event){
+$(function (){
+	$('form').on('submit', function (event){
+		$('.output').empty();
+		
 		event.preventDefault();
-		var city = inputElement.value;
-		var zipCode = inputElement.value;
-		getWeather(city);
-	};
-};
+		
+		var userInput = $('input').val();
+		var cities = userInput.split(',');
+		
+		for(var i = 0; i < cities.length; i++){
+			var cityName = cities[i];
+			getWeather(cityName);
+		}
+		
+	});
+});
 
-function printWeather(event){
-	var response = JSON.parse(event.target.responseText);
-	document.write(response.main.temp);
+function printWeather(response){
+	var element = $('<p>',{
+		text: response.main.temp
+	});
+	var cities = $('<p>',{
+		text: response.name
+	});
+	$('.output').append(cities);
+  $('.output').append(element);
 }
 
-function getWeather(city) {
-  var url = 'http://api.openweathermap.org/data/2.5/weather?' + 
+function getWeather(cities) {
+  var url = 'https://crossorigin.me/http://api.openweathermap.org/data/2.5/weather?' + 
   'appid=c2f2d170f6f6fc336058e9851edb828c'+
-  '&q=' + city +
+  '&q=' + cities +
   '&units=imperial';
-
-  var xhrObject = new XMLHttpRequest();
-  xhrObject.open('GET', url, true);
-  xhrObject.onload = printWeather;
-  xhrObject.send();
+  
+  $.get(url, printWeather);
+}
